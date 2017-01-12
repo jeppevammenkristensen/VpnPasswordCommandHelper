@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace VpnPasswords
@@ -45,14 +46,17 @@ namespace VpnPasswords
             {
                 Console.WriteLine($"{index++}: {ciscoSite.Customer}");
             }
+
+            var openConfigurationIndex = index;
+            Console.WriteLine($"{index}: Åben folder for konfiguration");
             
             Console.Write("Vælg site (afslut med enter)");
-            var site = GetReadLineThrowOnExit();
 
             Tuple<CiscoSite,Check> result;
             do
             {
-                result = TrySelectSite(site, sites);
+                var site = GetReadLineThrowOnExit();
+                result = TrySelectSite(site, sites, openConfigurationIndex);
 
             } while (result.Item2 != Check.Ok);
 
@@ -94,12 +98,19 @@ namespace VpnPasswords
         }
         
 
-        private Tuple<CiscoSite, Check> TrySelectSite(string input, IList<CiscoSite> sites)
+        private Tuple<CiscoSite, Check> TrySelectSite(string input, IList<CiscoSite> sites, int openConfigurationIndex)
         {
             uint index;
-            if (!uint.TryParse(input, out index) && sites.Count <= index) {
+            if (!uint.TryParse(input, out index) && sites.Count <= index && openConfigurationIndex != index) {
                 Console.WriteLine("Invalid input prøv igen");
                 return new Tuple<CiscoSite, Check>(null, Check.InvalidInput);
+            }
+
+            if (openConfigurationIndex == index)
+            {
+                // Open explorer window
+                Process.Start(".");
+                return new Tuple<CiscoSite, Check>(null, Check.OtherThanSiteSelect);
             }
 
             return Tuple.Create(sites[(int) index], Check.Ok);

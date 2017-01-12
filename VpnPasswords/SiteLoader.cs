@@ -8,11 +8,6 @@ namespace VpnPasswords
 {
     public class SiteLoader
     {
-        public SiteLoader()
-        {
-
-        }
-
         public IList<CiscoSite> Load()
         {
             var jsonSerializerSettings = new JsonSerializerSettings()
@@ -26,25 +21,30 @@ namespace VpnPasswords
             }
             catch (Exception)
             {
-                var result = new List<CiscoSite>
-                {
-                    new CiscoSite()
-                    {
-                        Customer = "DummyCustomer",
-                        CiscoUrl = "DummyUrl",
-                        CiscoUserName = "DummyUserName",
-                        CiscoPassword = "DummyPassword"
-                    }
-                };
-
-                var text = JsonConvert.SerializeObject(result, jsonSerializerSettings);
-
-                File.WriteAllText("configuration.json", text);
-
-                Console.WriteLine("Configurationfile was not ready but generated it for you (in the same place as the exe file)");
-                return result;
+                return GenerateDummyConfigurationDataAndOutput(jsonSerializerSettings);
             }
             
+        }
+
+        private static List<CiscoSite> GenerateDummyConfigurationDataAndOutput(JsonSerializerSettings jsonSerializerSettings)
+        {
+            var result = new List<CiscoSite>
+            {
+                new CiscoSite()
+                {
+                    Customer = "DummyCustomer",
+                    CiscoUrl = "DummyUrl",
+                    CiscoUserName = "DummyUserName",
+                    CiscoPassword = "DummyPassword"
+                }
+            };
+
+            var text = JsonConvert.SerializeObject(result, jsonSerializerSettings);
+
+            File.WriteAllText("configuration.json", text);
+
+            Console.WriteLine("Configurationfile was not ready but generated it for you (in the same place as the exe file)");
+            return result;
         }
     }
 }

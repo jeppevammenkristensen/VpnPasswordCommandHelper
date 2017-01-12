@@ -4,6 +4,7 @@
     {
         Ok, 
         InvalidInput,
+        OtherThanSiteSelect,
         Exit    
     }
 }
