@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -115,7 +110,7 @@ namespace VpnPasswords
             }
             
             Console.Write("Vælg site (afslut med enter)");
-            var site = Console.ReadLine();
+            var site = GetReadLineThrowOnExit();
 
             Tuple<CiscoSite,Check> result;
             do
@@ -133,32 +128,37 @@ namespace VpnPasswords
             while (true)
             {
                 Clipboard.SetText($"{resultItem1.CiscoUrl}");
-                Console.WriteLine($"CiscoUrl {resultItem1.CiscoUrl} Copied to clipboard");
-                if (Console.ReadLine() != string.Empty)
+                Console.WriteLine($"CiscoUrl: {resultItem1.CiscoUrl} Copied to clipboard");
+                if (GetReadLineThrowOnExit() != string.Empty)
                     return;
 
                 Clipboard.SetText($"{resultItem1.CiscoUserName}");
-                Console.WriteLine($"Username {resultItem1.CiscoUserName} Copied to clipboard");
-                if (Console.ReadLine() != string.Empty)
+                Console.WriteLine($"Username: {resultItem1.CiscoUserName} Copied to clipboard");
+                if (GetReadLineThrowOnExit() != string.Empty)
                     return;
 
                 Clipboard.SetText($"{resultItem1.CiscoPassword}");
-                Console.WriteLine($"Password {resultItem1.CiscoPassword} Copied to clipboard");
-                if (Console.ReadLine() != string.Empty)
+                Console.WriteLine($"Password: {resultItem1.CiscoPassword} Copied to clipboard");
+                if (GetReadLineThrowOnExit() != string.Empty)
                     return;
 
             }
         }
-        
-        
 
-        private Tuple<CiscoSite, Check> TrySelectSite(string input, IList<CiscoSite> sites)
+        private string GetReadLineThrowOnExit()
         {
-            if (input.Equals("exit", StringComparison.InvariantCultureIgnoreCase))
+            var readLine = Console.ReadLine();
+            if (readLine?.Equals("exit", StringComparison.CurrentCultureIgnoreCase) == true)
             {
                 throw new ExitException();
             }
 
+            return readLine;
+        }
+        
+
+        private Tuple<CiscoSite, Check> TrySelectSite(string input, IList<CiscoSite> sites)
+        {
             uint index;
             if (!uint.TryParse(input, out index) && sites.Count <= index) {
                 Console.WriteLine("Invalid input prøv igen");
